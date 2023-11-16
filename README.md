@@ -35,13 +35,13 @@ Welcome to the Financial News Scraper project, a Django web application that lev
 
 To run the project locally, follow these steps:
 
-1. Clone the repository: `git clone https://github.com/yourusername/financial-scraper.git`
-2. Navigate to the project directory: `cd financial-scraper`
+1. Clone the repository: `git clone https://github.com/samtechy26/FinVista-DataHarvest.git`
+2. Navigate to the project directory: `cd FinVista-DataHarvest`
 3. Install dependencies: `pip install -r requirements.txt`
 4. Set up the PostgreSQL database and update the database configuration in the `settings.py` file.
 5. Set up Redis and update the configuration accordingly.
 6. Run migrations: `python manage.py migrate`
-7. Start the Celery worker: `celery -A yourprojectname worker --loglevel=info`
+7. Start the Celery worker: `celery -A core worker --loglevel=info`
 8. Run the development server: `python manage.py runserver`
 
 Access the application at `http://localhost:8000` in your browser.
