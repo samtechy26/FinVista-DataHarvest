@@ -12,22 +12,36 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
+import environ
 from celery.schedules import crontab
 
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
+
+
+READ_DOT_ENV_FILE = env.bool('READ_DOT_ENV_FILE', default=False)
+if READ_DOT_ENV_FILE:
+    environ.Env.read_env()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
+# Take environment variables from .env file
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('WEB_SCRAPER_SECRET_KEY')
+# False if not in os.environ because of casting above
+DEBUG = env('DEBUG')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Raises Django's ImproperlyConfigured
+# exception if SECRET_KEY not in os.environ
+SECRET_KEY = env('SECRET_KEY')
 
-ALLOWED_HOSTS = []
+
+
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -46,11 +60,12 @@ INSTALLED_APPS = [
 ]
 
 CELERY_BEAT_SCHEDULE = {
-    "SendScheduledEmails": {
+    "SendScheduledScrapings": {
         'task': 'core.tasks.scrape_dev_to',
-        'schedule': 10  # crontab(minute="*/30")  # Every 30 mins
+        'schedule': crontab(minute='0', hour='*/6')
     }
 }
+
 
 
 MIDDLEWARE = [
@@ -90,7 +105,8 @@ WSGI_APPLICATION = 'newsscraper.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        
     }
 }
 
@@ -143,4 +159,7 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL')
+# CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL')
+CELERY_BROKER_URL = env('CELERY_BROKER_URL')
+CELERY_BACKEND = env('CELERY_BACKEND')
+

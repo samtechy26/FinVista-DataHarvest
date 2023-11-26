@@ -49,7 +49,7 @@ def scrape(url):
             # try get title
             title_result = article.find_element(By.TAG_NAME,'h3')
             news_item_title = title_result.text
-            print(news_item_title)
+            
 
             two_years_ago = datetime.date.today() - relativedelta(years=2)
 
@@ -77,6 +77,8 @@ def scrape(url):
                 today = datetime.date.today()
                 new_item_date = new_item_date.replace(
                     year=today.year).date()
+            
+            
 
             # if new_item_date > two_years_ago:
             NewsItem.objects.get_or_create(
@@ -85,3 +87,6 @@ def scrape(url):
                 source='Dev.to',
                 publish_date=new_item_date
             )
+    browser.quit()
+
+
